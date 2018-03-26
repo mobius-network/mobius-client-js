@@ -9,10 +9,9 @@ $(function() {
   $('#secret').val(keypair.secret());
 
   $('#challenge').on('click', function() {
-    MobiusClient.Auth.fetchChallenge("/auth", "GAAKYSMQ5YNOXRDAUAHM6BPYX627P2TMARJ5U43FTFKQLQBXYQ6T6ZNO")
+    MobiusClient.Auth.fetchChallenge("/auth", "GCDKKHKJLLREGJHHJVLPCIM2N2F55IADTBSD3JCM47JDEPFO4VGG2RXN")
       .then(challenge => {
-        xdr = response.data;
-        $('#challenge_xdr').val(xdr);
+        $('#challenge_xdr').val(challenge.toEnvelope().toXDR('base64'));
       })
       .catch(error => {
         $("#result").html(error.message);

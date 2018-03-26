@@ -31,30 +31,30 @@ let generateChallenge = (developerSecret) => {
     .build();
 
   tx.sign(keypair);
-
-  return tx;
+  return tx.toEnvelope().toXDR('base64');
 };
 
-let fetchChallenge = ((endpoint, appPublicKey) => {
+let fetchChallenge = (endpoint, appPublicKey) => {
   let url = URI(endpoint);
   let keypair = StellarSdk.Keypair.fromPublicKey(appPublicKey);
 
   let promise = new Promise((resolve, reject) => {
     fetch(url.toString())
       .then(response => {
-        //let tx = new StellarSdk.Transaction(response.text());
-        console.log(response);
-        console.log("X");
-        // if (!keypair.verify(tx, tx.signatures[0])) {
-        //   reject(new Error("Wrong challenge transaction signature"));
-        // } else {
-        //   resolve(tx);
-        // }
+        return response.text();
+      })
+      .then(body => {
+        let tx = new StellarSdk.Transaction(body);
+        if (!keypair.verify(tx.hash(), tx.signatures[0].signature())) {
+          return reject(new Error("Wrong challenge transaction signature"));
+        } else {
+          return resolve(tx);
+        }
       });
   });
 
   return promise;
-});
+};
 
 let fetchToken = ((endpoint, tx, userSecret) => {
   let url = URI(endpoint);

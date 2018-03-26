@@ -6,7 +6,9 @@ const app = express()
 const PORT = 3000
 const keypair = StellarSdk.Keypair.random()
 
-console.log(`APP PUBLIC KEY: ${keypair.publicKey()}`)
+StellarSdk.Network.useTestNetwork();
+
+console.log(`App Public Key: ${keypair.publicKey()}`)
 
 app.use(express.static('examples/auth'))
 app.use(express.static('dist'))

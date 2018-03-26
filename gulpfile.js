@@ -30,13 +30,15 @@ gulp.task('build:browser', ['lint:src'], function() {
   return gulp.src('src/browser.js')
     .pipe(plugins.webpack({
       output: { library: 'MobiusClient' },
+      externals: {
+        'stellar-sdk': 'StellarSdk'
+      },
       module: {
         loaders: [
-          { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'}
+          { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
         ],
       },
       plugins: [
-        // Ignore native modules (ed25519)
         new webpackStream.webpack.IgnorePlugin(/ed25519/)
       ]
     }))
