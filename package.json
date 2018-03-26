@@ -1,0 +1,50 @@
+{
+  "name": "mobius-client-js",
+  "version": "0.1.0",
+  "description": "Mobius DApp Store API",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobius-network/mobius-client-js"
+  },
+  "author": "Mobius Network <info@mobius.network>",
+  "license": "MIT",
+  "keywords": [
+    "stellar",
+    "mobius",
+    "mobi"
+  ],
+  "scripts": {
+    "version": "gulp build"
+  },
+  "engines": {
+    "node": ">=0.10 <=4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "7.1.1",
+    "babel-preset-env": "^1.6.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-insert": "^0.5.0",
+    "gulp-jshint": "^2.1.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-plumber": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-rimraf": "^0.2.2",
+    "gulp-uglify": "^3.0.0",
+    "gulp-webpack": "^1.5.0",
+    "jshint": "^2.9.5",
+    "jshint-stylish": "^2.2.1",
+    "run-sequence": "^2.2.1",
+    "webpack": "3",
+    "webpack-stream": "^4.0.3"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "es6-promise": "^4.2.4",
+    "stellar-sdk": "^0.8.0",
+    "urijs": "^1.19.1",
+    "whatwg-fetch": "^2.0.3"
+  }
+}
