@@ -56,10 +56,46 @@ let fetchChallenge = (endpoint, appPublicKey) => {
   return promise;
 };
 
-let fetchToken = ((endpoint, tx, userSecret) => {
+let fetchToken = (endpoint, tx, userSecret) => {
   let url = URI(endpoint);
   let keypair = StellarSdk.Keypair.fromSecret(userSecret);
 
-});
+  tx.sign(keypair);
 
-export { generateChallenge, fetchChallenge, fetchToken };
+  let xdr = tx.toEnvelope().toXDR('base64');
+
+  return fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      xdr: xdr,
+      public_key: keypair.publicKey()
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.text();
+    }
+
+    throw new Error("OH");
+  });
+};
+
+let verifyToken = (xdr, userPublicKey, appSecret) => {
+  let tx = new StellarSdk.Transaction(xdr);
+  let userKeypair = StellarSdk.Keypair.fromPublicKey(userPublicKey);
+  let appKeypair = StellarSdk.Keypair.fromSecret(appSecret);
+  let appVerified = appKeypair.verify(tx.hash(), tx.signatures[0].signature());
+  let userVerified = userKeypair.verify(tx.hash(), tx.signatures[1].signature());
+
+  throw new Error("Signatures invalid");
+  // if ((!appVerified) || (!userVerified)) {
+  //   throw new Error("Signatures invalid");
+  // }
+  //
+  // return tx.hash().toString("hex");
+};
+
+export { generateChallenge, fetchChallenge, verifyToken, fetchToken };
