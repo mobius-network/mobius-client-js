@@ -1,0 +1,43 @@
+<html>
+<head>
+  <style>
+    .field { margin-top: 0.5em; }
+    label { width: 500px; display: block; }
+    input, textarea { width: 500px; }
+  </style>
+</head>
+<body>
+  <h1>Authorize application</h1>
+
+  <h2>Stage 1: Request Challenge</h2>
+  <div class="field">
+    <textarea id="challenge_xdr" disabled="disabled" rows="10"></textarea>
+  <div class="field">
+    <input type="button" value="Request challenge" id="challenge"></input>
+  </div>
+
+  <h2>Stage 2: Sign Challenge</h2>
+  <form>
+    <div class="field">
+      <label for="public_key">Public key:</label>
+      <input type="text" id="public_key"></input>
+    </div>
+    <div class="field">
+      <label for="secret">Private key:</label>
+      <input type="text" id="secret"></input>
+    </div>
+    <div class="field">
+      <input type="button" value="Sign and send challenge" id="sign"></input>
+    </div>
+    <textarea id="signed_challenge_xdr" disabled="disabled" rows="10"></textarea>
+
+    <h3 id="result">None</h3>
+  </form>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/0.8.0/stellar-sdk.js"></script>
+<script src="mobius-client.js"></script>
+<script src="app.js"></script>
+</html>
