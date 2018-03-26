@@ -9,7 +9,7 @@ $(function() {
   $('#secret').val(keypair.secret());
 
   $('#challenge').on('click', function() {
-    MobiusClient.Auth.fetchChallenge("/auth", "GCDKKHKJLLREGJHHJVLPCIM2N2F55IADTBSD3JCM47JDEPFO4VGG2RXN")
+    MobiusClient.Auth.fetchChallenge("/auth", $("#appPublicKey").val())
       .then(challenge => {
         $('#challenge_xdr').val(challenge.toEnvelope().toXDR('base64'));
       })

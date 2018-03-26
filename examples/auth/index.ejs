@@ -9,6 +9,11 @@
 <body>
   <h1>Authorize application</h1>
 
+  <div class="field">
+    <label for="appPublicKey">Application Public Key</label>
+    <input type="text" disabled="disabled" value="<%= publicKey %>" id="appPublicKey"></input>
+  </div>
+
   <h2>Stage 1: Request Challenge</h2>
   <div class="field">
     <textarea id="challenge_xdr" disabled="disabled" rows="10"></textarea>
@@ -19,11 +24,11 @@
   <h2>Stage 2: Sign Challenge</h2>
   <form>
     <div class="field">
-      <label for="public_key">Public key:</label>
+      <label for="public_key">Public Key:</label>
       <input type="text" id="public_key"></input>
     </div>
     <div class="field">
-      <label for="secret">Private key:</label>
+      <label for="secret">Private Key:</label>
       <input type="text" id="secret"></input>
     </div>
     <div class="field">
