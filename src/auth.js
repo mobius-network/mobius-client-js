@@ -57,45 +57,49 @@ let fetchChallenge = (endpoint, appPublicKey) => {
 };
 
 let fetchToken = (endpoint, tx, userSecret) => {
-  let url = URI(endpoint);
-  let keypair = StellarSdk.Keypair.fromSecret(userSecret);
+  return new Promise((resolve, reject) => {
+    let url = URI(endpoint);
+    let keypair = StellarSdk.Keypair.fromSecret(userSecret);
 
-  tx.sign(keypair);
+    tx.sign(keypair);
 
-  let xdr = tx.toEnvelope().toXDR('base64');
+    let xdr = tx.toEnvelope().toXDR('base64');
 
-  return fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      xdr: xdr,
-      public_key: keypair.publicKey()
+    return fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        xdr: xdr,
+        public_key: keypair.publicKey()
+      })
     })
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.text();
-    }
+    .then(response => {
+      if (response.ok) {
+        return resolve(response.text());
+      }
 
-    throw new Error("OH");
+      response.json()
+        .then(json => { return reject(new Error(json.error)); });
+    });
   });
 };
 
 let verifyToken = (xdr, userPublicKey, appSecret) => {
-  let tx = new StellarSdk.Transaction(xdr);
-  let userKeypair = StellarSdk.Keypair.fromPublicKey(userPublicKey);
-  let appKeypair = StellarSdk.Keypair.fromSecret(appSecret);
-  let appVerified = appKeypair.verify(tx.hash(), tx.signatures[0].signature());
-  let userVerified = userKeypair.verify(tx.hash(), tx.signatures[1].signature());
+  return new Promise((resolve, reject) => {
+    let tx = new StellarSdk.Transaction(xdr);
+    let userKeypair = StellarSdk.Keypair.fromPublicKey(userPublicKey);
+    let appKeypair = StellarSdk.Keypair.fromSecret(appSecret);
+    let appVerified = appKeypair.verify(tx.hash(), tx.signatures[0].signature());
+    let userVerified = userKeypair.verify(tx.hash(), tx.signatures[1].signature());
+    
+    if ((!appVerified) || (!userVerified)) {
+      return reject(Error("Signatures invalid"));
+    }
 
-  throw new Error("Signatures invalid");
-  // if ((!appVerified) || (!userVerified)) {
-  //   throw new Error("Signatures invalid");
-  // }
-  //
-  // return tx.hash().toString("hex");
+    return resolve(tx.hash().toString("hex"));
+  });
 };
 
 export { generateChallenge, fetchChallenge, verifyToken, fetchToken };

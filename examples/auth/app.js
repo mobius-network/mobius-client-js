@@ -13,8 +13,8 @@ $(function() {
         tx = challenge;
         $('#challenge_xdr').val(challenge.toEnvelope().toXDR('base64'));
       })
-      .catch(error => {
-        $("#result").html(error.message);
+      .catch(err => {
+        $("#result").html(err.message);
       });
   });
 
@@ -24,7 +24,7 @@ $(function() {
         $('#result').html(body);
       })
       .catch(err => {
-        alert(err);
+         $('#result').html(err.message);
       });
   });
 })

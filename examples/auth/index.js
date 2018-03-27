@@ -27,9 +27,9 @@ app.get('/auth', (req, res) => {
 })
 
 app.post('/auth', (req, res) => {
-  res.send(
-    MobiusClient.Auth.verifyToken(req.body.xdr, req.body.public_key, keypair.secret())
-  )
+  MobiusClient.Auth.verifyToken(req.body.xdr, req.body.public_key, keypair.secret())
+    .then(body => res.send(body))
+    .catch(error => res.status(500).send({ error: error.message }))
 })
 
 app.listen(PORT, () => console.log(`Auth example app is listening on port ${PORT}!`))
