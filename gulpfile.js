@@ -8,25 +8,17 @@ var webpackStream = require('webpack-stream');
 
 gulp.task('default', ['build']);
 
-gulp.task('lint:src', function() {
-  return gulp.src(['src/**/*.js'])
-    .pipe(plugins.plumber())
-    .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('jshint-stylish'))
-    .pipe(plugins.jshint.reporter('fail'));
-});
-
 gulp.task('build', function(done) {
   runSequence('clean', 'build:node', 'build:browser', done);
 });
 
-gulp.task('build:node', ['lint:src'], function() {
+gulp.task('build:node', function() {
   return gulp.src('src/**/*.js')
     .pipe(plugins.babel())
     .pipe(gulp.dest('lib'));
 });
 
-gulp.task('build:browser', ['lint:src'], function() {
+gulp.task('build:browser', function() {
   return gulp.src('src/browser.js')
     .pipe(plugins.webpack({
       output: { library: 'MobiusClient' },
