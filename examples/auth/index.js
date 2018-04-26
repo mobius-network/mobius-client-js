@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 
 app.get('/auth', (req, res) => {
   res.send(
-    MobiusClient.Auth.generateChallenge(keypair.secret())
+    MobiusClient.Auth.Challenge.call(keypair.secret())
   );
 })
 

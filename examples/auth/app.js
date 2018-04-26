@@ -8,10 +8,12 @@ $(function() {
   $('#secret').val(keypair.secret());
 
   $('#challenge').on('click', function() {
-    MobiusClient.Auth.fetchChallenge("/auth", $("#appPublicKey").val())
-      .then(challenge => {
-        tx = challenge;
-        $('#challenge_xdr').val(challenge.toEnvelope().toXDR('base64'));
+    axios
+      .get("/auth")
+      .then(response => {
+        console.log(response);
+        xdr = response.data;
+        $("#challenge_xdr").val(xdr);
       })
       .catch(err => {
         $("#result").html(err.message);
