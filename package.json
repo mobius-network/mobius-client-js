@@ -26,7 +26,10 @@
     "prepack": "npm run build"
   },
   "lint-staged": {
-    "src/**/*.js": ["prettier --write", "git add"]
+    "src/**/*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "engines": {
     "node": ">=0.10 <=4"
@@ -53,9 +56,6 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "es6-promise": "^4.2.4",
-    "stellar-sdk": "^0.8.0",
-    "urijs": "^1.19.1",
-    "whatwg-fetch": "^2.0.3"
+    "stellar-sdk": "^0.8.0"
   }
 }
