@@ -3,6 +3,8 @@ import { Promise } from "es6-promise";
 import URI from "urijs";
 import StellarSdk from "stellar-sdk";
 import Challenge from "./auth/challenge";
+import Sign from "./auth/sign";
+import Token from "./auth/token";
 
 function fetchChallenge(endpoint, appPublicKey) {
   const url = URI(endpoint).toString();
@@ -68,4 +70,4 @@ function verifyToken(xdr, userPublicKey, appSecret) {
   });
 }
 
-export { Challenge, fetchChallenge, verifyToken, fetchToken };
+export { Challenge, Sign, fetchChallenge, verifyToken, fetchToken };
