@@ -70,4 +70,4 @@ function verifyToken(xdr, userPublicKey, appSecret) {
   });
 }
 
-export { Challenge, Sign, fetchChallenge, verifyToken, fetchToken };
+export { Challenge, Sign, Token, fetchChallenge, verifyToken, fetchToken };
