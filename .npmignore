@@ -7,5 +7,10 @@
 *.tgz
 /tmp/
 
+.babelrc
+.eslint*
+.gitignore
+
 /dist/
-/lib/
+/src/
+/config/
