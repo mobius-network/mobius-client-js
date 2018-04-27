@@ -19,11 +19,12 @@
     "build:cjs:production": "babel src -d lib --ignore spec.js,test.js",
     "build:umd:development": "webpack --config config/webpack.development.js",
     "build:umd:production": "webpack --config config/webpack.production.js",
-    "build": "npm run build:cjs:production & npm run build:umd:production",
-    "development": "npm run build:cjs:development & npm run build:umd:development",
+    "build": "yarn run build:cjs:production & yarn run build:umd:production",
+    "development": "yarn run build:cjs:development & yarn run build:umd:development",
+    "example": "yarn run build && node examples/auth/index.js",
     "lint": "eslint --quiet . --ext .js",
     "precommit": "lint-staged",
-    "prepack": "npm run build"
+    "prepack": "yarn run build"
   },
   "lint-staged": {
     "src/**/*.js": [
