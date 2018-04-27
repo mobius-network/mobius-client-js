@@ -31,9 +31,10 @@ export default class Token {
 
   /**
    * Validates transaction signed by developer and user.
+   * @param {boolean} strict=true - if true, checks that lower time limit is within Mobius::Client.strict_interval seconds from now
    * @return {boolean} true if transaction is valid, raises exception otherwise
    */
-  validate() {
+  validate(strict = true) {
     if (!this._signedCorrectly()) {
       throw new Error("Wrong challenge transaction signature");
     }
@@ -41,6 +42,10 @@ export default class Token {
     const bounds = this.timeBounds();
 
     if (!this._timeNowCovers(bounds)) {
+      throw new Error("Challenge transaction expired");
+    }
+
+    if (strict && this._tooOld(bounds)) {
       throw new Error("Challenge transaction expired");
     }
 
@@ -98,7 +103,7 @@ export default class Token {
   /**
    * @private
    * @param {xdr.TimeBounds} Time bounds for given transaction
-   * @returns {Bool} true if current time is within transaction time bounds
+   * @returns {boolean} true if current time is within transaction time bounds
    */
   _timeNowCovers(timeBounds) {
     const now = Math.floor(new Date().getTime() / 1000);
@@ -107,5 +112,15 @@ export default class Token {
       now >= parseInt(timeBounds.minTime, 10) &&
       now <= parseInt(timeBounds.maxTime, 10)
     );
+  }
+
+  /**
+   * @param {xdr.TimeBounds} Time bounds for given transaction
+   * @returns {boolean} true if transaction is created more than 10 secods from now
+   */
+  _tooOld(timeBounds) {
+    const now = Math.floor(new Date().getTime() / 1000);
+
+    return now > parseInt(timeBounds.minTime, 10) + 10;
   }
 }
