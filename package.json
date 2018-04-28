@@ -1,6 +1,6 @@
 {
   "name": "mobius-client-js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mobius DApp Store API",
   "main": "lib/index.js",
   "repository": {
