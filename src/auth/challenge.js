@@ -18,6 +18,7 @@ const Challenge = {
     const keypair = this._keypair(developerSecret);
     const account = new Account(keypair.publicKey(), this._randomSequence());
     const tx = new TransactionBuilder(account, {
+      memo: this._memo(),
       timebounds: this._buildTimeBounds()
     })
       .addOperation(
@@ -26,8 +27,7 @@ const Challenge = {
           destination: keypair.publicKey(),
           sequence: this._randomSequence(),
           amount: "0.000001",
-          asset: Asset.native(),
-          memo: this._memo()
+          asset: Asset.native()
         })
       )
       .build();
