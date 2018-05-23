@@ -25,7 +25,7 @@ const Sign = {
   /**
    * @private
    * @param {string} userSecret - Users private key
-   * @returns {Keypair} Keypair object for given users private key
+   * @returns {StellarSdk.Keypair} Keypair object for given users private key
    */
   _keypair(userSecret) {
     return Keypair.fromSecret(userSecret);
@@ -33,8 +33,8 @@ const Sign = {
 
   /**
    * @private
-   * @param  {string}  address - Developers public key
-   * @returns {Keypair} Keypair object for given developers public key
+   * @param {string}  address - Developers public key
+   * @returns {StellarSdk.Keypair} Keypair object for given developers public key
    */
   _developerKeypair(address) {
     return Keypair.fromPublicKey(address);
@@ -43,8 +43,8 @@ const Sign = {
   /**
    * Validates transaction is signed by developer.
    * @private
-   * @param {Keypair} keypair - Keypair object for given Developer public key
-   * @param {Transaction} tx - Transaction to verify
+   * @param {StellarSdk.Keypair} keypair - Keypair object for given Developer public key
+   * @param {StellarSdk.Transaction} tx - Transaction to verify
    * @returns {boolean} true is transaction is valid, throws error otherwise
    */
   _validate(keypair, tx) {
