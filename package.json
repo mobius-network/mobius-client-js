@@ -63,6 +63,7 @@
     "webpack-cli": "^2.0.14"
   },
   "dependencies": {
+    "es6-promise": "^4.2.4",
     "stellar-sdk": "^0.8.0"
   }
 }
