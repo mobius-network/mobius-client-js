@@ -12,25 +12,20 @@ const Urls = {
 
 export default class Client {
   constructor() {
-    this._assetCode = "MOBI";
     this._assetIssuer = undefined;
     this._challengeExpiresIn = undefined;
     this._horizonClient = undefined;
-    this._mobiusHost = "https://mobius.network";
     this._network = Network.current()
       ? Network.current().networkPassphrase()
       : Networks.TESTNET;
     this._stellarAsset = undefined;
-    this._strictInterval = undefined;
   }
 
   /**
    * Get Mobius API host
    * @returns {string} Mobius API host
    */
-  static get mobiusHost() {
-    return this._mobiusHost;
-  }
+  static mobiusHost = "https://mobius.network";
 
   /**
    * Set Stellar network to use
@@ -73,9 +68,7 @@ export default class Client {
    * Get Mobius Asset code
    * @returns {string} Mobius Asset code
    */
-  static get assetCode() {
-    return this._assetCode;
-  }
+  static assetCode = "MOBI";
 
   /**
    * Get Asset Issuer account ID
@@ -124,9 +117,5 @@ export default class Client {
    * In strict mode, session must be not older than 10 seconds from now
    * @returns {number} strict interval value in seconds (10 by default)
    */
-  static get strictInterval() {
-    this._strictInterval = this._strictInterval || 10;
-
-    return this._strictInterval;
-  }
+  static strictInterval = 10;
 }
