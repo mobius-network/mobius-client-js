@@ -1,15 +1,25 @@
 import { Asset, Network, Networks, Server } from "stellar-sdk";
 
+const Issuers = {
+  PUBLIC: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
+  TESTNET: "GDRWBLJURXUKM4RWDZDTPJNX6XBYFO3PSE4H4GPUL6H6RCUQVKTSD4AT"
+};
+
+const Urls = {
+  TESTNET: "https://horizon-testnet.stellar.org",
+  PUBLIC: "https://horizon.stellar.org"
+};
+
 export default class Client {
   constructor() {
-    this._assetCode = undefined;
+    this._assetCode = "MOBI";
     this._assetIssuer = undefined;
     this._challengeExpiresIn = undefined;
     this._horizonClient = undefined;
-    this._mobiusHost = undefined;
+    this._mobiusHost = "https://mobius.network";
     this._network = Network.current()
       ? Network.current().networkPassphrase()
-      : undefined;
+      : Networks.TESTNET;
     this._stellarAsset = undefined;
     this._strictInterval = undefined;
   }
@@ -19,8 +29,6 @@ export default class Client {
    * @returns {string} Mobius API host
    */
   static get mobiusHost() {
-    this._mobiusHost = this._mobiusHost || "https://mobius.network";
-
     return this._mobiusHost;
   }
 
@@ -36,11 +44,9 @@ export default class Client {
 
   /**
    * Get current network
-   * @returns {string} value - Stellar network passphrase
+   * @returns {string} Stellar network passphrase
    */
   get network() {
-    this._network = this._network || Networks.TESTNET;
-
     return this._network;
   }
 
@@ -54,9 +60,9 @@ export default class Client {
     }
 
     const horizonClient =
-      this.network === Networks.TESTNET
-        ? new Server("https://horizon-testnet.stellar.org")
-        : new Server("https://horizon.stellar.org");
+      this.network === Networks.PUBLIC
+        ? new Server(Urls.PUBLIC)
+        : new Server(Urls.TESTNET);
 
     this._horizonClient = horizonClient;
 
@@ -68,8 +74,6 @@ export default class Client {
    * @returns {string} Mobius Asset code
    */
   static get assetCode() {
-    this._assetCode = this._assetCode || "MOBI";
-
     return this._assetCode;
   }
 
@@ -83,9 +87,7 @@ export default class Client {
     }
 
     const assetIssuer =
-      this.network === Networks.PUBLIC
-        ? "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH"
-        : "GDRWBLJURXUKM4RWDZDTPJNX6XBYFO3PSE4H4GPUL6H6RCUQVKTSD4AT";
+      this.network === Networks.PUBLIC ? Issuers.PUBLIC : Issuers.TESTNET;
 
     this._assetIssuer = assetIssuer;
 
@@ -119,7 +121,7 @@ export default class Client {
   }
 
   /**
-   * In strict mode, session must be not older than seconds from now
+   * In strict mode, session must be not older than 10 seconds from now
    * @returns {number} strict interval value in seconds (10 by default)
    */
   static get strictInterval() {
