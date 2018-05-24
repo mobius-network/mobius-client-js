@@ -6,6 +6,7 @@ import {
   Operation,
   TransactionBuilder
 } from "stellar-sdk";
+import Client from "../client";
 
 /** Generates challenge transaction on developer's side. */
 const Challenge = {
@@ -60,7 +61,9 @@ const Challenge = {
    */
   _buildTimeBounds() {
     const minTime = Math.floor(new Date().getTime() / 1000).toString();
-    const maxTime = Math.floor(new Date().getTime() / 1000 + 3600).toString();
+    const maxTime = Math.floor(
+      new Date().getTime() / 1000 + Client.challengeExpiresIn
+    ).toString();
 
     return {
       minTime,

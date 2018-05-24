@@ -1,4 +1,5 @@
 import { Keypair, Transaction } from "stellar-sdk";
+import Client from "../client";
 import { verify } from "../utils/keypair";
 
 /** Checks challenge transaction signed by user on developer's side. */
@@ -19,7 +20,7 @@ export default class Token {
    * Returns time bounds for given transaction
    * @returns {StellarSdk.xdr.TimeBounds} Time bounds for given transaction (`minTime` and `maxTime`)
    */
-  timeBounds() {
+  get timeBounds() {
     const { timeBounds } = this._tx;
 
     if (!timeBounds) {
@@ -35,11 +36,11 @@ export default class Token {
    * @returns {boolean} true if transaction is valid, raises exception otherwise
    */
   validate(strict = true) {
-    if (!this._signedCorrectly()) {
+    if (!this._signedCorrectly) {
       throw new Error("Wrong challenge transaction signature");
     }
 
-    const bounds = this.timeBounds();
+    const bounds = this.timeBounds;
 
     if (!this._timeNowCovers(bounds)) {
       throw new Error("Challenge transaction expired");
@@ -72,7 +73,7 @@ export default class Token {
    * @private
    * @returns {StellarSdk.Keypair} Keypair object for given Developer private key
    */
-  _getKeypair() {
+  get _getKeypair() {
     this._keypair = this._keypair || Keypair.fromSecret(this._developerSecret);
 
     return this._keypair;
@@ -82,7 +83,7 @@ export default class Token {
    * @private
    * @returns {StellarSdk.Keypair} Keypair object of user being authorized
    */
-  _getTheirKeypair() {
+  get _getTheirKeypair() {
     this._theirKeypair =
       this._theirKeypair || Keypair.fromPublicKey(this._address);
 
@@ -93,9 +94,9 @@ export default class Token {
    * @private
    * @returns {boolean} true if transaction is correctly signed by user and developer
    */
-  _signedCorrectly() {
-    const isSignedByDeveloper = verify(this._tx, this._getKeypair());
-    const isSignedByUser = verify(this._tx, this._getTheirKeypair());
+  get _signedCorrectly() {
+    const isSignedByDeveloper = verify(this._tx, this._getKeypair);
+    const isSignedByUser = verify(this._tx, this._getTheirKeypair);
 
     return isSignedByDeveloper && isSignedByUser;
   }
@@ -121,6 +122,6 @@ export default class Token {
   _tooOld(timeBounds) {
     const now = Math.floor(new Date().getTime() / 1000);
 
-    return now > parseInt(timeBounds.minTime, 10) + 10;
+    return now > parseInt(timeBounds.minTime, 10) + Client.strictInterval;
   }
 }
