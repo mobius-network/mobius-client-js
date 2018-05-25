@@ -12,20 +12,70 @@ const Urls = {
 
 export default class Client {
   constructor() {
-    this._assetIssuer = undefined;
-    this._challengeExpiresIn = undefined;
     this._horizonClient = undefined;
     this._network = Network.current()
       ? Network.current().networkPassphrase()
       : Networks.TESTNET;
-    this._stellarAsset = undefined;
   }
+
+  /**
+   * Get Mobius Asset code
+   * @returns {string} Mobius Asset code
+   */
+  static assetCode = "MOBI";
+
+  /**
+   * Get Asset Issuer account ID
+   * @returns {string} Asset Issuer account ID
+   */
+  static get assetIssuer() {
+    if (this._assetIssuer) {
+      return this._assetIssuer;
+    }
+
+    const assetIssuer =
+      Network.current().networkPassphrase() === Networks.PUBLIC
+        ? Issuers.PUBLIC
+        : Issuers.TESTNET;
+
+    this._assetIssuer = assetIssuer;
+
+    return this._assetIssuer;
+  }
+
+  /**
+   * Get Challenge expiration value
+   * @returns {number} Challenge expiration value in seconds (1d by defaul)
+   */
+  static challengeExpiresIn = 60 * 60 * 24;
 
   /**
    * Get Mobius API host
    * @returns {string} Mobius API host
    */
   static mobiusHost = "https://mobius.network";
+
+  /**
+   * Get Stellar Asset instance of asset used for payments
+   * @returns {StellarSdk.Asset} instance of asset used for payments
+   */
+  static get stellarAsset() {
+    if (this._stellarAsset) {
+      return this._stellarAsset;
+    }
+
+    const stellarAsset = new Asset(this.assetCode, this.assetIssuer);
+
+    this._stellarAsset = stellarAsset;
+
+    return this._stellarAsset;
+  }
+
+  /**
+   * In strict mode, session must be not older than 10 seconds from now
+   * @returns {number} strict interval value in seconds (10 by default)
+   */
+  static strictInterval = 10;
 
   /**
    * Set Stellar network to use
@@ -63,59 +113,4 @@ export default class Client {
 
     return this._horizonClient;
   }
-
-  /**
-   * Get Mobius Asset code
-   * @returns {string} Mobius Asset code
-   */
-  static assetCode = "MOBI";
-
-  /**
-   * Get Asset Issuer account ID
-   * @returns {string} Asset Issuer account ID
-   */
-  static get assetIssuer() {
-    if (this._assetIssuer) {
-      return this._assetIssuer;
-    }
-
-    const assetIssuer =
-      this.network === Networks.PUBLIC ? Issuers.PUBLIC : Issuers.TESTNET;
-
-    this._assetIssuer = assetIssuer;
-
-    return this._assetIssuer;
-  }
-
-  /**
-   * Get Challenge expiration value
-   * @returns {number} Challenge expiration value in seconds (1d by defaul)
-   */
-  static get challengeExpiresIn() {
-    this._challengeExpiresIn = this._challengeExpiresIn || 60 * 60 * 24;
-
-    return this._challengeExpiresIn;
-  }
-
-  /**
-   * Get Stellar Asset instance of asset used for payments
-   * @returns {StellarSdk.Asset} instance of asset used for payments
-   */
-  static get stellarAsset() {
-    if (this._stellarAsset) {
-      return this._stellarAsset;
-    }
-
-    const stellarAsset = new Asset(this.assetCode, this.assetIssuer);
-
-    this._stellarAsset = stellarAsset;
-
-    return this._stellarAsset;
-  }
-
-  /**
-   * In strict mode, session must be not older than 10 seconds from now
-   * @returns {number} strict interval value in seconds (10 by default)
-   */
-  static strictInterval = 10;
 }
