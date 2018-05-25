@@ -17,7 +17,7 @@ const AddCosigner = {
 
     tx.sign(account.keypair);
 
-    client.submitTransaction(tx);
+    return client.submitTransaction(tx);
   },
 
   /**
