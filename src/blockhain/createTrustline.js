@@ -1,30 +1,27 @@
 import { TransactionBuilder, Operation } from "stellar-sdk";
 import Client from "../client";
-import Account from "./account";
+import AccountBuilder from "./accountBuilder";
 
-/** # Creates unlimited trustline for given asset. */
+/** Creates unlimited trustline for given asset. */
 const CreateTrustline = {
   /**
-   * Executes an operation.
    * @param {StellarSdk.Keypair} keypair - Account keypair
    * @param {StellarSdk.Asset} asset
    * @returns {Promise}
    */
-  call(keypair, asset = Client.stellarAsset) {
-    const client = this._client();
-    const account = this._account(keypair);
+  async call(keypair, asset = Client.stellarAsset) {
+    const client = new Client().horizonClient;
+    const account = await AccountBuilder.build(keypair);
+    const tx = this._tx(account.info, asset);
 
-    return account.info().then(acc => {
-      const tx = this._tx(acc, asset);
+    tx.sign(account.keypair);
 
-      tx.sign(account.account());
-
-      return client.submitTransaction(tx);
-    });
+    client.submitTransaction(tx);
   },
 
   /**
-   * Generate changeTrust transaction with given parameters
+   * Generate changeTrust transaction with given parameters.
+   * @private
    * @param {Account} account
    * @param {StellarSdk.Asset} asset
    * @returns {StellarSdk.Transaction}
@@ -37,19 +34,6 @@ const CreateTrustline = {
         })
       )
       .build();
-  },
-
-  /**
-   * @private
-   * @param {StellarSdk.Keypair} keypair - Account keypair
-   * @returns {Account} Account instance
-   */
-  _account(keypair) {
-    return new Account(keypair);
-  },
-
-  _client() {
-    return new Client().horizonClient;
   }
 };
 

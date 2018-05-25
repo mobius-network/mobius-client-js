@@ -1,5 +1,5 @@
-import Account from "./account";
+import AccountBuilder from "./accountBuilder";
 import AddCosigner from "./addCosigner";
 import CreateTrustline from "./createTrustline";
 
-export { Account, AddCosigner, CreateTrustline };
+export { AccountBuilder, AddCosigner, CreateTrustline };

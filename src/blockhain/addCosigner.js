@@ -1,31 +1,28 @@
 import { TransactionBuilder, Operation } from "stellar-sdk";
 import Client from "../client";
-import Account from "./account";
+import AccountBuilder from "./accountBuilder";
 
 /** Adds account as cosigner to other account. */
 const AddCosigner = {
   /**
-   * Executes an operation.
    * @param {StellarSdk.Keypair} keypair - Account keypair
    * @param {StellarSdk.Keypair} cosignerKeypair - Cosigner account keypair
    * @param {number} [weight=1] - Cosigner weight
    * @returns {Promise}
    */
-  call(keypair, cosignerKeypair, weight = 1) {
-    const client = this._client();
-    const account = this._account(keypair);
+  async call(keypair, cosignerKeypair, weight = 1) {
+    const client = new Client().horizonClient;
+    const account = await AccountBuilder.build(keypair);
+    const tx = this._tx(account.info, cosignerKeypair, weight);
 
-    return account.reload().then(acc => {
-      const tx = this._tx(acc, cosignerKeypair, weight);
+    tx.sign(account.keypair);
 
-      tx.sign(account.account());
-
-      return client.submitTransaction(tx);
-    });
+    client.submitTransaction(tx);
   },
 
   /**
-   * Generate setOptions transaction with given parameters
+   * Generate setOptions transaction with given parameters.
+   * @private
    * @param {Account} account
    * @param {StellarSdk.Keypair} cosignerKeypair
    * @param {number} weight
@@ -46,19 +43,6 @@ const AddCosigner = {
         })
       )
       .build();
-  },
-
-  /**
-   * @private
-   * @param {StellarSdk.Keypair} keypair - Account keypair
-   * @returns {Account} Account instance
-   */
-  _account(keypair) {
-    return new Account(keypair);
-  },
-
-  _client() {
-    return new Client().horizonClient;
   }
 };
 

@@ -1,136 +1,86 @@
 import { Keypair } from "stellar-sdk";
-import { Promise } from "es6-promise";
 import Client from "../client";
 
 /** Service class used to interact with account on Stellar network. */
 export default class Account {
   /**
-   * @param {StellarSdk.Keypair} keypair - account keypair
+   * @param {object} account
+   * @param {StellarSdk.Keypair} keypair
    */
-  constructor(keypair) {
-    this._keypair = keypair;
-    this._account = undefined;
-    this._accountInfo = undefined;
-  }
-
-  /**
-   * Returns true if trustline exists for given asset and limit is positive.
-   * @param {StellarSdk.Asset}
-   * @returns {boolean} true if trustline exists
-   */
-  trustlineExists(asset = Client.stellarAsset) {
-    try {
-      const balance = this._findBalance(asset);
-      const limit = balance && parseFloat(balance.limit);
-
-      return limit > 0;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  /**
-   * Returns balance for given asset
-   * @param {StellarSdk.Asset} [asset=Client.stellarAsset]
-   * @returns {number}
-   */
-  balance(asset = Client.stellarAsset) {
-    try {
-      const balance = this._findBalance(asset);
-
-      if (balance) {
-        return parseFloat(balance.balance);
-      }
-
-      return null;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  /**
-   * Returns true if given keypair is added as cosigner to current account.
-   * @param {StellarSdk.Keypair} toKeypair
-   * @returns {boolean} true if cosigner added
-   */
-  authorized(toKeypair) {
-    try {
-      const signer = this._findSigner(toKeypair.publicKey());
-
-      return !!signer;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  /**
-   * @returns {StellarSdk.Keypair} Keypair object as account
-   */
-  account() {
-    if (this._account) {
-      return this._account;
-    }
-
-    const account = this._keypair.canSign()
-      ? Keypair.fromSecret(this._keypair.secret())
-      : Keypair.fromPublicKey(this._keypair.publicKey());
-
+  constructor(account, keypair) {
     this._account = account;
+    this._keypair = keypair;
+    this._assetIssuers = [];
+  }
 
+  /**
+   * @returns {StellarSdk.Keypair} Keypair object for current account
+   */
+  get keypair() {
+    return this._keypair;
+  }
+
+  /**
+   * @returns {object} Account information
+   */
+  get info() {
     return this._account;
   }
 
   /**
-   * Requests and caches Account information from network.
+   * @param {StellarSdk.Keypair} toKeypair
+   * @returns {boolean} true if given keypair is added as cosigner to current account
+   */
+  authorized(toKeypair) {
+    const signer = this._findSigner(toKeypair.publicKey());
+
+    return !!signer;
+  }
+
+  /**
+   * @param {StellarSdk.Asset} [asset=Client.stellarAsset]
+   * @returns {number} balance for given asset
+   */
+  balance(asset = Client.stellarAsset) {
+    const balance = this._findBalance(asset);
+
+    return parseFloat((balance || {}).balance);
+  }
+
+  /**
+   * @param {StellarSdk.Asset}
+   * @returns {boolean} true if trustline exists for given asset and limit is positive
+   */
+  trustlineExists(asset = Client.stellarAsset) {
+    const balance = this._findBalance(asset);
+    const limit = parseFloat((balance || {}).limit);
+
+    return limit > 0;
+  }
+
+  /**
+   * Invalidates current account information.
    * @returns {Promise}
    */
-  info() {
-    return new Promise((resolve, reject) => {
-      if (this._accountInfo) {
-        resolve(this._accountInfo);
-      }
+  reload() {
+    this._account = null;
 
-      const accountId = this.account().publicKey();
+    return new Promise((resolve, reject) => {
+      const accountId = this._keypair.publicKey();
 
       new Client().horizonClient
         .loadAccount(accountId)
-        .then(accountInfo => {
-          this._accountInfo = accountInfo;
+        .then(account => {
+          this._account = account;
 
-          resolve(this._accountInfo);
+          resolve(this);
         })
         .catch(error => reject(error));
     });
   }
 
   /**
-   * Invalidates account information cache.
-   * @returns {Promise}
-   */
-  reload() {
-    this._accountInfo = null;
-
-    return this.info();
-  }
-
-  /**
    * @private
-   * @param {StellarSdk.Asset} asset - Asset to find
-   * @returns {object} matched balance entry
-   */
-  _findBalance(asset) {
-    try {
-      const balance = this._accountInfo.balances.reduce(
-        (acc, val) => (this._balanceMatches(asset, val) ? val : acc)
-      );
-
-      return balance;
-    } catch (error) {
-      throw new Error("Stellar account does not exists");
-    }
-  }
-
-  /**
    * @param {StellarSdk.Asset} asset - Asset to compare
    * @param {any} balance - balance entry to compare
    * @returns {boolean} true if balance matches with given asset
@@ -146,26 +96,36 @@ export default class Account {
       return assetType === "native";
     }
 
-    const assetIssuerPublicKey = Keypair.fromPublicKey(
-      asset.issuer
-    ).publicKey();
+    this._assetIssuers[assetCode] =
+      this._assetIssuers[assetCode] ||
+      Keypair.fromPublicKey(asset.issuer).publicKey();
 
-    return assetCode === asset.code && assetIssuer === assetIssuerPublicKey;
+    return (
+      assetCode === asset.code && assetIssuer === this._assetIssuers[assetCode]
+    );
   }
 
   /**
+   * @private
+   * @param {StellarSdk.Asset} asset - Asset to find
+   * @returns {object} matched balance
+   */
+  _findBalance(asset) {
+    const balance = this._account.balances.find(b =>
+      this._balanceMatches(asset, b)
+    );
+
+    return balance;
+  }
+
+  /**
+   * @private
    * @param {string} publicKey - signer's key to find
-   * @returns {object} matched signer entry
+   * @returns {object} matched signer
    */
   _findSigner(publicKey) {
-    try {
-      const signer = this._accountInfo.signers.reduce(
-        (acc, val) => (val.public_key === publicKey ? val : acc)
-      );
+    const signer = this._account.signers.find(s => s.public_key === publicKey);
 
-      return signer;
-    } catch (error) {
-      throw new Error("Stellar account does not exists");
-    }
+    return signer;
   }
 }
