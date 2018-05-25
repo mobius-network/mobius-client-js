@@ -9,8 +9,9 @@ export default class App {
    */
   constructor(appAccount, userAccount) {
     this._appAccount = appAccount;
+    this._clientInstance = new Client().horizonClient;
+    this._fee = 100;
     this._userAccount = userAccount;
-    this._clientInstance = undefined;
   }
 
   /**
@@ -33,11 +34,6 @@ export default class App {
   get appKeypair() {
     return this._appAccount.keypair;
   }
-
-  /**
-   * @returns {number} max fee willing to pay per operation
-   */
-  fee = 100;
 
   /**
    * @returns {number} user balance
@@ -68,7 +64,7 @@ export default class App {
 
     const tx = this._paymentTransaction(amount, thirdPartyAddress);
 
-    return this._client.submitTransaction(tx);
+    return this._clientInstance.submitTransaction(tx);
   }
 
   /**
@@ -84,17 +80,7 @@ export default class App {
 
     const tx = this._transferTransaction(amount, thirdPartyAddress);
 
-    return this._client.submitTransaction(tx);
-  }
-
-  /**
-   * @private
-   * @returns {StellarSdk.Server} StellarSdk.Server instance
-   */
-  get _client() {
-    this._clientInstance = this._clientInstance || new Client().horizonClient;
-
-    return this._clientInstance;
+    return this._clientInstance.submitTransaction(tx);
   }
 
   /**
@@ -119,7 +105,7 @@ export default class App {
    */
   _paymentTransaction(amount, thirdPartyAddress) {
     const tx = new TransactionBuilder(this.userAccount, {
-      fee: thirdPartyAddress ? this.fee * 2 : this.fee
+      fee: this._fee
     }).addOperation(this._paymentOperation(amount));
 
     if (thirdPartyAddress) {
