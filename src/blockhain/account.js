@@ -11,7 +11,7 @@ export default class Account {
     this._account = account;
     this._keypair = keypair;
     this._assetIssuers = [];
-    this._clientInstance = undefined;
+    this._clientInstance = new Client().horizonClient;
   }
 
   /**
@@ -66,7 +66,7 @@ export default class Account {
   async reload() {
     this._account = null;
     const accountId = this._keypair.publicKey();
-    const account = await this._client.loadAccount(accountId);
+    const account = await this._clientInstance.loadAccount(accountId);
     this._account = account;
 
     return this;
@@ -96,16 +96,6 @@ export default class Account {
     return (
       assetCode === asset.code && assetIssuer === this._assetIssuers[assetCode]
     );
-  }
-
-  /**
-   * @private
-   * @returns {StellarSdk.Server} StellarSdk.Server instance
-   */
-  get _client() {
-    this._clientInstance = this._clientInstance || new Client().horizonClient;
-
-    return this._clientInstance;
   }
 
   /**
