@@ -24,6 +24,8 @@ describe("Auth.Token", () => {
   });
 
   it(".validate() returns true if current time is within bounds", () => {
+    expect.assertions(1);
+
     freeze(new Date());
 
     const tx = generateSignedChallengeTx(userKeypair, developerKeypair);
@@ -37,6 +39,8 @@ describe("Auth.Token", () => {
   });
 
   it(".validate() throws error if current time is outside bounds", () => {
+    expect.assertions(1);
+
     const tx = generateSignedChallengeTx(userKeypair, developerKeypair);
     const token = new Token(
       developerKeypair.secret(),
@@ -51,6 +55,8 @@ describe("Auth.Token", () => {
   });
 
   it("returns transaction hash", () => {
+    expect.assertions(1);
+
     const tx = generateSignedChallengeTx(userKeypair, developerKeypair);
     const token = new Token(
       developerKeypair.secret(),

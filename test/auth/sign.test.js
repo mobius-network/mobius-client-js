@@ -23,6 +23,8 @@ describe("Auth.Sign", () => {
   });
 
   it("signs challenge correctly by user", () => {
+    expect.assertions(1);
+
     const tx = generateSignedChallengeTx(userKeypair, developerKeypair);
 
     expect(verify(new Transaction(tx), userKeypair)).toBe(true);
