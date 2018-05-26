@@ -5,6 +5,7 @@
     "node": true,
     "jest": true
   },
+  "parser": "babel-eslint",
   "rules": {
     "no-underscore-dangle": ["error", { "allowAfterThis": true }],
     "class-methods-use-this": "off"

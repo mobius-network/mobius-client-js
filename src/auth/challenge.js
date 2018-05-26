@@ -6,13 +6,14 @@ import {
   Operation,
   TransactionBuilder
 } from "stellar-sdk";
+import Client from "../client";
 
 /** Generates challenge transaction on developer's side. */
 const Challenge = {
   /**
    * Generates challenge transaction signed by developers private key.
-   * @param  {string} developerSecret - Developers private key
-   * @return {String} base64-encoded transaction envelope
+   * @param {string} developerSecret - Developers private key
+   * @returns {string} base64-encoded transaction envelope
    */
   call(developerSecret) {
     const keypair = this._keypair(developerSecret);
@@ -39,8 +40,8 @@ const Challenge = {
 
   /**
    * @private
-   * @param  {string} developerSecret - Developers private key
-   * @returns {Keypair} Keypair
+   * @param {string} developerSecret - Developers private key
+   * @returns {StellarSdk.Keypair} Keypair
    */
   _keypair(developerSecret) {
     return Keypair.fromSecret(developerSecret);
@@ -60,7 +61,9 @@ const Challenge = {
    */
   _buildTimeBounds() {
     const minTime = Math.floor(new Date().getTime() / 1000).toString();
-    const maxTime = Math.floor(new Date().getTime() / 1000 + 3600).toString();
+    const maxTime = Math.floor(
+      new Date().getTime() / 1000 + Client.challengeExpiresIn
+    ).toString();
 
     return {
       minTime,
@@ -70,7 +73,7 @@ const Challenge = {
 
   /**
    * @private
-   * @returns {Memo} Auth transaction memo
+   * @returns {StellarSdk.Memo} Auth transaction memo
    */
   _memo() {
     return Memo.text("Mobius authentication");

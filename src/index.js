@@ -1,4 +1,4 @@
-/* eslint-disable import/prefer-default-export */
+import Client from "./client";
 import * as Auth from "./auth";
 
-export { Auth };
+export { Client, Auth };
