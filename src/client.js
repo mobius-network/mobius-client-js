@@ -13,9 +13,7 @@ const Urls = {
 export default class Client {
   constructor() {
     this._horizonClient = undefined;
-    this._network = Network.current()
-      ? Network.current().networkPassphrase()
-      : Networks.TESTNET;
+    this._network = Network.current() || new Network(Networks.TESTNET);
   }
 
   /**
@@ -29,18 +27,13 @@ export default class Client {
    * @returns {string} Asset Issuer account ID
    */
   static get assetIssuer() {
-    if (this._assetIssuer) {
-      return this._assetIssuer;
-    }
-
     const assetIssuer =
+      Network.current() &&
       Network.current().networkPassphrase() === Networks.PUBLIC
         ? Issuers.PUBLIC
         : Issuers.TESTNET;
 
-    this._assetIssuer = assetIssuer;
-
-    return this._assetIssuer;
+    return assetIssuer;
   }
 
   /**
@@ -82,14 +75,14 @@ export default class Client {
    * @param {string} value - network passphrase
    */
   set network(value) {
-    this._network = value;
+    this._network = new Network(value);
 
     Network.use(this._network);
   }
 
   /**
    * Get current network
-   * @returns {string} Stellar network passphrase
+   * @returns {StellarSdk.Network} StellarSdk.Network instance
    */
   get network() {
     return this._network;
@@ -104,8 +97,10 @@ export default class Client {
       return this._horizonClient;
     }
 
+    const networkPassphrase = this.network.networkPassphrase();
+
     const horizonClient =
-      this.network === Networks.PUBLIC
+      networkPassphrase === Networks.PUBLIC
         ? new Server(Urls.PUBLIC)
         : new Server(Urls.TESTNET);
 

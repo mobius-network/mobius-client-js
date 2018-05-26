@@ -8,7 +8,9 @@ describe("Client", () => {
 
       const clientInstance = new Client();
 
-      expect(clientInstance.network).toEqual(Networks.TESTNET);
+      expect(clientInstance.network.networkPassphrase()).toEqual(
+        Networks.TESTNET
+      );
     });
 
     test("...on public network", () => {
@@ -16,7 +18,9 @@ describe("Client", () => {
 
       const clientInstance = new Client();
 
-      expect(clientInstance.network).toEqual(Networks.PUBLIC);
+      expect(clientInstance.network.networkPassphrase()).toEqual(
+        Networks.PUBLIC
+      );
     });
   });
 });
