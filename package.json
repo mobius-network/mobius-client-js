@@ -1,19 +1,25 @@
 {
-  "name": "mobius-client-js",
+  "name": "@mobius-network/mobius-client-js",
   "version": "0.2.1",
   "description": "Mobius DApp Store API",
+  "keywords": [
+    "stellar",
+    "mobius",
+    "mobi",
+    "api",
+    "sdk"
+  ],
+  "homepage": "https://github.com/mobius-network/mobius-client-js",
+  "bugs": {
+    "url": "https://github.com/mobius-network/mobius-client-js/issues"
+  },
+  "license": "MIT",
+  "author": "Emil Kashkevich <emil.kashkevich@gmail.com>",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mobius-network/mobius-client-js"
   },
-  "author": "Mobius Network <info@mobius.network>",
-  "license": "MIT",
-  "keywords": [
-    "stellar",
-    "mobius",
-    "mobi"
-  ],
   "scripts": {
     "build:cjs:development": "babel src -w -d lib --ignore test.js",
     "build:cjs:production": "babel src -d lib --ignore test.js",
@@ -21,20 +27,15 @@
     "build:umd:production": "webpack --config config/webpack.production.js",
     "build": "yarn run build:cjs:production & yarn run build:umd:production",
     "development": "yarn run build:cjs:development & yarn run build:umd:development",
-    "example": "yarn run build && node examples/auth/index.js",
+    "example:auth": "yarn run build && node examples/auth/index.js",
     "lint": "eslint --quiet . --ext .js",
     "precommit": "lint-staged",
     "prepack": "yarn run build",
     "test": "jest --config test/jest.config.js"
   },
-  "lint-staged": {
-    "src/**/*.js": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "engines": {
-    "node": ">=0.10 <=4"
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "stellar-sdk": "^0.8.0"
   },
   "devDependencies": {
     "axios": "^0.18.0",
@@ -63,8 +64,13 @@
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.14"
   },
-  "dependencies": {
-    "babel-runtime": "^6.26.0",
-    "stellar-sdk": "^0.8.0"
+  "engines": {
+    "node": ">=4"
+  },
+  "lint-staged": {
+    "src/**/*.js": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }

@@ -71,7 +71,7 @@ export default class Token {
 
   /**
    * @private
-   * @returns {StellarSdk.Keypair} Keypair object for given Developer private key
+   * @returns {StellarSdk.Keypair} StellarSdk.Transaction object for given Developer private key
    */
   get _getKeypair() {
     this._keypair = this._keypair || Keypair.fromSecret(this._developerSecret);
@@ -81,7 +81,7 @@ export default class Token {
 
   /**
    * @private
-   * @returns {StellarSdk.Keypair} Keypair object of user being authorized
+   * @returns {StellarSdk.Keypair} StellarSdk.Transaction object of user being authorized
    */
   get _getTheirKeypair() {
     this._theirKeypair =
@@ -116,7 +116,7 @@ export default class Token {
   }
 
   /**
-   * @param {StellarSdk.xdr.TimeBounds}timeBounds - Time bounds for given transaction
+   * @param {StellarSdk.xdr.TimeBounds} timeBounds - Time bounds for given transaction
    * @returns {boolean} true if transaction is created more than 10 secods from now
    */
   _tooOld(timeBounds) {

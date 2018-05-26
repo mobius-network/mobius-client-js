@@ -15,7 +15,7 @@ export default class Account {
   }
 
   /**
-   * @returns {StellarSdk.Keypair} Keypair object for current account
+   * @returns {StellarSdk.Keypair} StellarSdk.Transaction object for current account
    */
   get keypair() {
     return this._keypair;
