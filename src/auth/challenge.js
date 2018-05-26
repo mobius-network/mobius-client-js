@@ -41,7 +41,7 @@ const Challenge = {
   /**
    * @private
    * @param {string} developerSecret - Developers private key
-   * @returns {StellarSdk.Keypair} Keypair
+   * @returns {StellarSdk.Keypair} StellarSdk.Keypair
    */
   _keypair(developerSecret) {
     return Keypair.fromSecret(developerSecret);

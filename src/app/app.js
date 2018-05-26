@@ -22,14 +22,14 @@ export default class App {
   }
 
   /**
-   * @returns {number} pp balance
+   * @returns {number} app balance
    */
   get appBalance() {
     return this._appAccount.balance();
   }
 
   /**
-   * @returns {StellarSdk.Keypair} Keypair object for app
+   * @returns {StellarSdk.Keypair} StellarSdk.Keypair object for app
    */
   get appKeypair() {
     return this._appAccount.keypair;
@@ -45,7 +45,7 @@ export default class App {
   }
 
   /**
-   * @returns {StellarSdk.Keypair} Keypair object for user
+   * @returns {StellarSdk.Keypair} StellarSdk.Keypair object for user
    */
   get userKeypair() {
     return this._appAccount.keypair;
