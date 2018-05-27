@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js.svg)](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js)
+
 # mobius-client-js
 
 # Mobius DApp Store JS SDK
@@ -90,7 +92,7 @@ app.get("/auth", (req, res) => {
 // POST /auth
 // Validates challenge transaction. It must be:
 //  - Signed by application and requesting user.
-//   - Not older than 10 seconds from now (see MobiusClient.Client.strictInterval`)
+//  - Not older than 10 seconds from now (see MobiusClient.Client.strictInterval`)
 app.post("/auth", (req, res) => {
   try {
     const token = new MobiusClient.Auth.Token(
