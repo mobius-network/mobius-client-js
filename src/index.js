@@ -1,6 +1,6 @@
-import App from "./app";
 import * as Auth from "./auth";
-import Client from "./client";
 import * as Blockchain from "./blockhain";
 
-export { App, Auth, Client, Blockchain };
+export { Auth, Blockchain };
+export { App, AppBuilder } from "./app";
+export { default as Client } from "./client";
