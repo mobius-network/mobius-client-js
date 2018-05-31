@@ -48,7 +48,7 @@ export default class App {
    * @returns {StellarSdk.Keypair} StellarSdk.Keypair object for user
    */
   get userKeypair() {
-    return this._appAccount.keypair;
+    return this._userAccount.keypair;
   }
 
   /**
