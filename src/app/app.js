@@ -22,6 +22,13 @@ export default class App {
   }
 
   /**
+   * @returns {Account} app acount
+   */
+  get appAccount() {
+    return this._appAccount;
+  }
+
+  /**
    * @returns {number} app balance
    */
   get appBalance() {
@@ -33,6 +40,13 @@ export default class App {
    */
   get appKeypair() {
     return this._appAccount.keypair;
+  }
+
+  /**
+   * @returns {Account} user account
+   */
+  get userAccount() {
+    return this._userAccount;
   }
 
   /**
@@ -48,7 +62,7 @@ export default class App {
    * @returns {StellarSdk.Keypair} StellarSdk.Keypair object for user
    */
   get userKeypair() {
-    return this._appAccount.keypair;
+    return this._userAccount.keypair;
   }
 
   /**
@@ -58,11 +72,17 @@ export default class App {
    * @returns {Promise}
    */
   async pay(amount, thirdPartyAddress = null) {
+    this._userAccount = await this.userAccount.reload();
+
     if (this.userBalance < parseFloat(amount)) {
       throw new Error("Insufficient Funds");
     }
 
+    this._appAccount = await this.appAccount.reload();
+
     const tx = this._paymentTransaction(amount, thirdPartyAddress);
+
+    tx.sign(this.appKeypair);
 
     return this._clientInstance.submitTransaction(tx);
   }
@@ -74,11 +94,17 @@ export default class App {
    * @returns {Promise}
    */
   async transfer(amount, thirdPartyAddress) {
+    this._appAccount = await this.appAccount.reload();
+
     if (this.appBalance < parseFloat(amount)) {
       throw new Error("Insufficient Funds");
     }
 
+    this._userAccount = await this.userAccount.reload();
+
     const tx = this._transferTransaction(amount, thirdPartyAddress);
+
+    tx.sign(this.appKeypair);
 
     return this._clientInstance.submitTransaction(tx);
   }
@@ -104,7 +130,7 @@ export default class App {
    * @returns {StellarSdk.Transaction} payment transaction
    */
   _paymentTransaction(amount, thirdPartyAddress) {
-    const tx = new TransactionBuilder(this.userAccount, {
+    const tx = new TransactionBuilder(this.userAccount.info, {
       fee: this._fee
     }).addOperation(this._paymentOperation(amount));
 
@@ -114,9 +140,7 @@ export default class App {
       );
     }
 
-    tx.build();
-
-    return tx;
+    return tx.build();
   }
 
   /**
@@ -153,7 +177,7 @@ export default class App {
    * @returns {StellarSdk.Transaction} payment transaction
    */
   _transferTransaction(amount, thirdPartyAddress) {
-    return new TransactionBuilder(this.appAccount)
+    return new TransactionBuilder(this.appAccount.info)
       .addOperation(this._paymentOperation(amount, thirdPartyAddress))
       .build();
   }
@@ -181,7 +205,7 @@ export default class App {
       throw new Error("Authorisation missing");
     }
 
-    if (!this._userAccount.trustlineExists()) {
+    if (!this.userAccount.trustlineExists()) {
       throw new Error("Trustline not found");
     }
 
