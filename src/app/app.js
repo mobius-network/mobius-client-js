@@ -22,6 +22,13 @@ export default class App {
   }
 
   /**
+   * @returns {Account} app acount
+   */
+  get appAccount() {
+    return this._appAccount;
+  }
+
+  /**
    * @returns {number} app balance
    */
   get appBalance() {
@@ -33,6 +40,13 @@ export default class App {
    */
   get appKeypair() {
     return this._appAccount.keypair;
+  }
+
+  /**
+   * @returns {Account} user account
+   */
+  get userAccount() {
+    return this._userAccount;
   }
 
   /**
@@ -181,7 +195,7 @@ export default class App {
       throw new Error("Authorisation missing");
     }
 
-    if (!this._userAccount.trustlineExists()) {
+    if (!this.userAccount.trustlineExists()) {
       throw new Error("Trustline not found");
     }
 
