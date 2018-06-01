@@ -78,6 +78,9 @@ Using express.js:
 
 ```js
 ...
+const MobiusClient = require("@mobius-network/mobius-client-js/lib"); 
+// import MobiusClient from "@mobius-network/mobius-client-js/lib"
+
 // GET /auth
 // Generates and returns challenge transaction XDR signed by application to user
 
