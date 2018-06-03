@@ -1,5 +1,5 @@
 import * as Auth from "./auth";
-import * as Blockchain from "./blockhain";
+import * as Blockchain from "./blockchain";
 
 export { Auth, Blockchain };
 export { App, AppBuilder } from "./app";

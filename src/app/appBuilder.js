@@ -1,5 +1,5 @@
 import { Keypair } from "stellar-sdk";
-import AccountBuilder from "../blockhain/accountBuilder";
+import AccountBuilder from "../blockchain/accountBuilder";
 import App from "./app";
 
 const AppBuilder = {
