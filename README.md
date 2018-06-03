@@ -77,10 +77,18 @@ $ yarn run example:auth
 Using express.js:
 
 ```js
-...
+const express = require("express");
+const app = express();
+
+// Enable CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 // GET /auth
 // Generates and returns challenge transaction XDR signed by application to user
-
 app.get("/auth", (req, res) => {
   res.send(
     MobiusClient.Auth.Challenge.call(
@@ -110,7 +118,8 @@ app.post("/auth", (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-...
+
+app.listen(process.env.PORT);
 ```
 
 ## Payment
