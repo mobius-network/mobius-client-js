@@ -63,7 +63,7 @@ Note: the challenge transaction also has time bounds to restrict the time window
 See demo at:
 
 ```bash
-$ git clone git@github.com/mobius-network/mobius-client-js.git
+$ git clone git@github.com:mobius-network/mobius-client-js.git
 
 $ cd mobius-client-js
 
@@ -78,6 +78,9 @@ Using express.js:
 
 ```js
 ...
+const MobiusClient = require("@mobius-network/mobius-client-js/lib"); 
+// import MobiusClient from "@mobius-network/mobius-client-js/lib"
+
 // GET /auth
 // Generates and returns challenge transaction XDR signed by application to user
 
@@ -124,7 +127,7 @@ After the user completes the authentication process they have a token. They now 
 ``` sh
 
 # Clone this repo
-$ git clone git@github.com/mobius-network/mobius-client-js.git && cd $_
+$ git clone git@github.com:mobius-network/mobius-client-js.git && cd $_
 
 # Install dependencies
 $ yarn install
