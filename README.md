@@ -1,4 +1,5 @@
 [![npm version](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js.svg)](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js)
+[![Build Status](https://travis-ci.org/mobius-network/mobius-client-js.svg?branch=master)](https://travis-ci.org/mobius-network/mobius-client-js)
 
 # mobius-client-js
 
