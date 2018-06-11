@@ -93,14 +93,14 @@ export default class App {
   }
 
   /**
-   * @deprecated Please use `Mobius.App.charge()` instead."
+   * @deprecated Please use `App.charge()` instead.
    * @param {number} amount - payment amount
    * @param {?string} destination - third party receiver address
    * @returns {StellarSdk.Operation} payment operation
    */
   pay = deprecate((amount, destination = null) => {
     return this.charge(amount, destination);
-  }, "`Mobius.App.pay()` is depreciated, please use `Mobius.App.charge()` instead.");
+  }, "`App.pay()` is deprecated, please use `App.charge()` instead.");
 
   /**
    * Sends money from the application account to the user or third party.
