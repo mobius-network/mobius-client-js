@@ -1,7 +1,7 @@
 // Mark that a method should not be used.
 // Returns a modified function which warns once by default.
 // If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function deprecate(fn, msg) {
+export default function deprecate(fn, msg) {
   // Allow for deprecating things in the process of starting up.
   if (global.process === undefined) {
     return function dep(...args) {
@@ -29,4 +29,4 @@ exports.deprecate = function deprecate(fn, msg) {
   }
 
   return deprecated;
-};
+}
