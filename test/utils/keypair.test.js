@@ -36,6 +36,8 @@ describe("utils/keypair", () => {
   });
 
   it("returns true if transaction is correctly signed", () => {
+    expect.assertions(1);
+
     const keypair = Keypair.random();
     const tx = generateSignedTx(keypair);
 
@@ -43,6 +45,8 @@ describe("utils/keypair", () => {
   });
 
   it("returns false if transaction is not correctly signed", () => {
+    expect.assertions(1);
+
     const keypair = Keypair.random();
     const anotherKeypair = Keypair.random();
     const tx = generateSignedTx(keypair);
