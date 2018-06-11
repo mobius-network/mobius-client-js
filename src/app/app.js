@@ -75,7 +75,7 @@ export default class App {
    * Charges specified amount from user account and then optionally transfers
    * it from app account to a third party in the same transaction.
    * @param {number} amount - Payment amount
-   * @param {?string} [destination] - Optional: third party receiver address
+   * @param {?string} [destination] - third party receiver address
    * @returns {Promise}
    */
   async charge(amount, destination = null) {
@@ -84,10 +84,10 @@ export default class App {
     }
 
     return this._submitTx(tx => {
-      tx.addOperation(this._chargeOp(amount));
+      tx.addOperation(this._userPaymentOp(amount, this.appKeypair.publicKey()));
 
       if (destination) {
-        tx.addOperation(this._transferOp(amount, destination));
+        tx.addOperation(this._appPaymentOp(amount, destination));
       }
     });
   }
@@ -98,23 +98,40 @@ export default class App {
    * @param {?string} destination - third party receiver address
    * @returns {StellarSdk.Operation} payment operation
    */
-  pay = deprecate((amount, destination = null) => {
-    return this.charge(amount, destination);
-  }, "`App.pay()` is deprecated, please use `App.charge()` instead.");
+  pay = deprecate(
+    (amount, destination = null) => this.charge(amount, destination),
+    "`App.pay()` is deprecated, please use `App.charge()` instead."
+  );
 
   /**
    * Sends money from the application account to the user or third party.
    * @param {number} amount - Payment amount
-   * @param {string} [destination] - Optional: third party receiver address
+   * @param {string} [destination] - third party receiver address
    * @returns {Promise}
    */
-  async transfer(amount, destination = this.userKeypair.publicKey()) {
+  async payout(amount, destination = this.userKeypair.publicKey()) {
     if (this.appBalance < Number(amount)) {
       throw new Error("Insufficient Funds");
     }
 
     return this._submitTx(tx => {
-      tx.addOperation(this._transferOp(amount, destination));
+      tx.addOperation(this._appPaymentOp(amount, destination));
+    });
+  }
+
+  /**
+   * Sends money from the user account to the third party directly.
+   * @param {number} amount - Payment amount
+   * @param {string} destination - third party receiver address
+   * @returns {Promise}
+   */
+  async transfer(amount, destination) {
+    if (this.userBalance < Number(amount)) {
+      throw new Error("Insufficient Funds");
+    }
+
+    return this._submitTx(tx => {
+      tx.addOperation(this._userPaymentOp(amount, destination));
     });
   }
 
@@ -147,24 +164,25 @@ export default class App {
   /**
    * @private
    * @param {number} amount - payment amount
+   * @param {string} destination - receiver address
    * @returns {Operation} payment operation
    */
-  _chargeOp(amount) {
+  _userPaymentOp(amount, destination) {
     return Operation.payment({
       asset: Client.stellarAsset,
       amount: amount.toString(),
       source: this.userKeypair.publicKey(),
-      destination: this.appKeypair.publicKey()
+      destination
     });
   }
 
   /**
    * @private
    * @param {number} amount - payment amount
-   * @param {string} destination - third party receiver address
+   * @param {string} destination - receiver address
    * @returns {Operation} payment operation
    */
-  _transferOp(amount, destination) {
+  _appPaymentOp(amount, destination) {
     return Operation.payment({
       asset: Client.stellarAsset,
       amount: amount.toString(),
