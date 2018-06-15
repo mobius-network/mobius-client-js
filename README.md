@@ -1,4 +1,5 @@
 [![npm version](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js.svg)](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js)
+[![Build Status](https://travis-ci.org/mobius-network/mobius-client-js.svg?branch=master)](https://travis-ci.org/mobius-network/mobius-client-js)
 
 # mobius-client-js
 
@@ -34,6 +35,55 @@ or
 
 ```
 $ npm install --save @mobius-network/mobius-client-js
+```
+
+## Mobius CLI
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'mobius-client'
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself with:
+
+    $ gem install mobius-client
+
+### Setting up the developer's application account
+
+Run:
+
+    $ mobius-cli create dapp-account
+
+Creates a new Stellar account with 1,000 test-net MOBI.
+
+You can also obtain free test network MOBI from https://mobius.network/friendbot
+
+### Setting up test user accounts
+
+1. Create an empty Stellar account without a MOBI trustline.
+    ```
+      $ mobius-cli create account
+    ```
+2. Create a stellar account with 1,000 test-net MOBI
+    ```
+      $ mobius-cli create dapp-account
+    ```
+3. Create a stellar account with 1,000 test-net MOBI and the specified application public key added as a signer
+    ```
+      $ mobius-cli create dapp-account -a <Your application public key>
+    ```
+
+### Account Creation Wizard
+
+The below command will create and setup the 4 account types above for testing and generate a simple HTML test interface that simulates the DApp Store authentication functionality (obtaining a challenge request from an app, signing it, and then opening the specified app passing in a JWT encoded token the application will use to verify this request is from the user that owns the specified MOBI account).
+
+```
+  $ mobius-cli create dev-wallet
 ```
 
 ## Production Server Setup
@@ -77,10 +127,18 @@ $ yarn run example:auth
 Using express.js:
 
 ```js
-...
+const express = require("express");
+const app = express();
+
+// Enable CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 // GET /auth
 // Generates and returns challenge transaction XDR signed by application to user
-
 app.get("/auth", (req, res) => {
   res.send(
     MobiusClient.Auth.Challenge.call(
@@ -110,7 +168,55 @@ app.post("/auth", (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-...
+
+app.listen(process.env.PORT);
+```
+
+## Instantiating App
+Once the user is authenticated, they are rerouted to the app URL. The next step is creating an APP instance for the application to interact with. The following snippet is a brief example.
+
+```js 
+/**
+ * @param {string} developerSecret - App developer secret key
+ * @param {string} userPublic - User public key
+ * @returns {Promise}
+ */
+new MobiusClient.AppBuilder.build(developerSecret, userPublic)
+  .then(rsp => { 
+    APP = rsp; 
+  };
+```
+
+## Account Details
+
+### App Account
+The following methods are used to get details about the app account.
+```js
+// returns app account details
+APP.appAccount
+
+// returns app account balance
+APP.appBalance
+
+// StellarSdk.Keypair object for app
+APP.appKeypair
+```
+
+### User Accounts
+The following methods are used to get details about the current user account.
+
+```js
+// Boolean - true if developer is authorized to use an application
+APP.authorized
+
+// returns user account details
+APP.userAccount
+
+// returns user account balance
+APP.userBalance
+
+// returns StellarSdk.Keypair object for user
+APP.userKeypair
 ```
 
 ## Payment
@@ -118,6 +224,37 @@ app.post("/auth", (req, res) => {
 ### Explanation
 
 After the user completes the authentication process they have a token. They now pass it to the application to "login" which tells the application which Mobius account to withdraw MOBI from (the user public key) when a payment is needed. For a web application the token is generally passed in via a `token` request parameter. Upon opening the website/loading the application it checks that the token is valid (within time bounds etc) and the account in the token has added the app as a signer so it can withdraw MOBI from it.
+
+#### Methods
+
+The following methods are used to transact between the app and user. `charge` is used to charge a user account and optionally transfer to a third party account. `payout` is used to send a payment from the application account to a user or third party. `transfer` is used to transact between the user and a third party directly (eg. user to user).
+
+```js
+/**
+ * Charges specified amount from user account and then optionally transfers
+ * it from app account to a third party in the same transaction.
+ * @param {number} amount - Payment amount
+ * @param {?string} [destination] - optional third party receiver address
+ * @returns {Promise}
+ */
+APP.charge(amount, destination).then(rsp => {...});
+
+/**
+ * Sends money from the application account to the user or third party.
+ * @param {number} amount - Payment amount
+ * @param {string} [destination] - third party receiver address
+ * @returns {Promise}
+ */
+APP.payout(amount, destination).then(rsp => {...});
+
+/**
+ * Sends money from the user account to the third party directly.
+ * @param {number} amount - Payment amount
+ * @param {string} destination - third party receiver address
+ * @returns {Promise}
+ */
+APP.transfer(amount, destination).then(rsp => {...})
+```
 
 ## Development
 
