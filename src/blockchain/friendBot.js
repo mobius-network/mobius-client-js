@@ -7,7 +7,9 @@ const FriendBot = {
    * @returns {Promise}
    */
   call(keypair) {
-    return new Client().horizonClient.friendbot(keypair.address());
+    const publicKey = keypair.publicKey();
+
+    return new Client().horizonClient.friendbot(publicKey).call();
   }
 };
 
