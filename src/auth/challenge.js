@@ -13,14 +13,15 @@ const Challenge = {
   /**
    * Generates challenge transaction signed by developers private key.
    * @param {string} developerSecret - Developers private key
+   * @param {number} expireIn - Session expiration time in seconds from now. Default is Client.challengeExpiresIn.
    * @returns {string} base64-encoded transaction envelope
    */
-  call(developerSecret) {
+  call(developerSecret, expireIn = null) {
     const keypair = this._keypair(developerSecret);
     const account = new Account(keypair.publicKey(), this._randomSequence());
     const tx = new TransactionBuilder(account, {
       memo: this._memo(),
-      timebounds: this._buildTimeBounds()
+      timebounds: this._buildTimeBounds(expireIn)
     })
       .addOperation(
         Operation.payment({
@@ -57,12 +58,13 @@ const Challenge = {
 
   /**
    * @private
+   * @param {number} expireIn - session expiration time in seconds from now
    * @returns {object} Time bounds (`minTime` and `maxTime`)
    */
-  _buildTimeBounds() {
+  _buildTimeBounds(expireIn) {
     const minTime = Math.floor(new Date().getTime() / 1000).toString();
     const maxTime = Math.floor(
-      new Date().getTime() / 1000 + Client.challengeExpiresIn
+      new Date().getTime() / 1000 + (expireIn || Client.challengeExpiresIn)
     ).toString();
 
     return {

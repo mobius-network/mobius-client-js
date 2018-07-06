@@ -31,6 +31,14 @@ export default class Token {
   }
 
   /**
+   * Returns address this token is issued for.
+   * @returns {string} Address.
+   */
+  get address() {
+    return this._getKeypair.publicKey();
+  }
+
+  /**
    * Validates transaction signed by developer and user.
    * @param {boolean} [strict=true] - if true, checks that lower time limit is within Mobius::Client.strict_interval seconds from now
    * @returns {boolean} true if transaction is valid, raises exception otherwise
