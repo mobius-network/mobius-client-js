@@ -1,6 +1,6 @@
 {
   "name": "@mobius-network/mobius-client-js",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Mobius DApp Store API",
   "keywords": [
     "stellar",
