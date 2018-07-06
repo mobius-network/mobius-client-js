@@ -31,7 +31,8 @@
     "lint": "eslint --quiet . --ext .js",
     "precommit": "lint-staged",
     "prepack": "yarn run build",
-    "test": "jest --config test/jest.config.js"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
@@ -74,5 +75,11 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js": "babel-jest"
+    },
+    "verbose": true
   }
 }

@@ -1,5 +1,7 @@
 [![npm version](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js.svg)](https://badge.fury.io/js/%40mobius-network%2Fmobius-client-js)
 [![Build Status](https://travis-ci.org/mobius-network/mobius-client-js.svg?branch=master)](https://travis-ci.org/mobius-network/mobius-client-js)
+[![Maintainability](https://api.codeclimate.com/v1/badges/cf6f78eade10ed549155/maintainability)](https://codeclimate.com/github/mobius-network/mobius-client-js/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/cf6f78eade10ed549155/test_coverage)](https://codeclimate.com/github/mobius-network/mobius-client-js/test_coverage)
 
 # mobius-client-js
 
