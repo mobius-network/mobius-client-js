@@ -8,18 +8,19 @@ import {
 } from "stellar-sdk";
 import { verify } from "../../src/utils/keypair";
 
-function generateSignedTx(keypair) {
-  const account = new Account(
+function account(keypair = Keypair.random()) {
+  return new Account(
     keypair.publicKey(),
     (99999999 - Math.floor(Math.random() * 65536)).toString()
   );
-  const tx = new TransactionBuilder(account)
+}
+
+function generateSignedTx(keypair) {
+  const tx = new TransactionBuilder(account(keypair))
     .addOperation(
       Operation.payment({
-        account: Keypair.random(),
         destination: keypair.publicKey(),
-        sequence: (99999999 - Math.floor(Math.random() * 65536)).toString(),
-        amount: "0.000001",
+        amount: "1",
         asset: Asset.native()
       })
     )
@@ -31,22 +32,29 @@ function generateSignedTx(keypair) {
 }
 
 describe("utils/keypair", () => {
+  const keypair = Keypair.random();
+  const anotherKeypair = Keypair.random();
+
   beforeAll(() => {
     Network.useTestNetwork();
   });
 
   it("returns true if transaction is correctly signed", () => {
-    const keypair = Keypair.random();
     const tx = generateSignedTx(keypair);
 
     expect(verify(tx, keypair)).toBe(true);
   });
 
   it("returns false if transaction is not correctly signed", () => {
-    const keypair = Keypair.random();
-    const anotherKeypair = Keypair.random();
     const tx = generateSignedTx(keypair);
 
+    expect(verify(tx, anotherKeypair)).toBe(false);
+  });
+
+  it("returns false if transaction is not signed", () => {
+    const tx = new TransactionBuilder(account(keypair)).build();
+
+    expect(verify(tx, keypair)).toBe(false);
     expect(verify(tx, anotherKeypair)).toBe(false);
   });
 });

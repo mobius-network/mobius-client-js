@@ -61,6 +61,7 @@
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "lint-staged": "^7.0.4",
+    "ms": "^2.1.1",
     "prettier": "^1.12.1",
     "timekeeper": "^2.1.1",
     "uglifyjs-webpack-plugin": "^1.2.4",

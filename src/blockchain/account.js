@@ -5,13 +5,20 @@ import Client from "../client";
 export default class Account {
   /**
    * @param {object} account
-   * @param {StellarSdk.Keypair} keypair
+   * @param {Keypair} keypair
    */
   constructor(account, keypair) {
     this._account = account;
     this._keypair = keypair;
     this._assetIssuers = [];
     this._clientInstance = new Client().horizonClient;
+  }
+
+  /**
+   * @returns {string} Account address on Stellar network (public key)
+   */
+  get address() {
+    return this._keypair.publicKey();
   }
 
   /**
@@ -29,7 +36,7 @@ export default class Account {
   }
 
   /**
-   * @param {StellarSdk.Keypair} toKeypair
+   * @param {Keypair} toKeypair
    * @returns {boolean} true if given keypair is added as cosigner to current account
    */
   authorized(toKeypair) {
@@ -49,7 +56,7 @@ export default class Account {
   }
 
   /**
-   * @param {StellarSdk.Asset}
+   * @param {StellarSdk.Asset} asset
    * @returns {boolean} true if trustline exists for given asset and limit is positive
    */
   trustlineExists(asset = Client.stellarAsset) {
