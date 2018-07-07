@@ -37,7 +37,7 @@ describe("Auth.Token", () => {
 
   it(".decode() returns payload", () => {
     const payload = jwt.decode(jwt.encode(token));
-    expect(payload.sub).toBe(developerKeypair.publicKey());
+    expect(payload.sub).toBe(userKeypair.publicKey());
   });
 
   afterEach(() => {

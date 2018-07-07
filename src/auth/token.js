@@ -35,7 +35,7 @@ export default class Token {
    * @returns {string} Address.
    */
   get address() {
-    return this._getKeypair.publicKey();
+    return this._getTheirKeypair.publicKey();
   }
 
   /**
