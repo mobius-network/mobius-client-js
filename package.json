@@ -63,11 +63,11 @@
     "prettier": "^1.12.1",
     "timekeeper": "^2.1.1",
     "uglifyjs-webpack-plugin": "^1.2.4",
-    "webpack": "^4.6.0",
+    "webpack": "^4.29.6",
     "webpack-cli": "^2.0.14"
   },
   "engines": {
-    "node": ">=4 <=9"
+    "node": ">=4 <=11"
   },
   "lint-staged": {
     "src/**/*.js": [
