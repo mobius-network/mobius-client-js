@@ -117,7 +117,9 @@ export default class Account {
    * @returns {object} matched signer
    */
   _findSigner(publicKey) {
-    const signer = this._account.signers.find(s => s.public_key === publicKey);
+    const signer = this._account.signers.find(
+      s => s.public_key === publicKey || s.key === publicKey
+    );
 
     return signer;
   }

@@ -67,7 +67,7 @@
     "webpack-cli": "^2.0.14"
   },
   "engines": {
-    "node": ">=4 <=9"
+    "node": ">=4 <=11"
   },
   "lint-staged": {
     "src/**/*.js": [
