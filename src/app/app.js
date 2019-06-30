@@ -18,6 +18,7 @@ export default class App {
     this._appAccount = appAccount;
     this._clientInstance = new Client().horizonClient;
     this._userAccount = userAccount;
+    this._validateUserAccount();
   }
 
   /**
@@ -59,8 +60,6 @@ export default class App {
    * @returns {number} user balance
    */
   get userBalance() {
-    this._validateUserBalance();
-
     return this._userAccount.balance();
   }
 
@@ -79,15 +78,15 @@ export default class App {
    * @returns {Promise}
    */
   async charge(amount, destination = null) {
-    if (this.userBalance < Number(amount)) {
-      throw new Error("Insufficient Funds");
-    }
+    this._ensureSufficientFunds(this.userAccount, amount);
 
     return this._submitTx(tx => {
-      tx.addOperation(this._userPaymentOp(amount, this.appKeypair.publicKey()));
+      tx.addOperation(
+        this._paymentOp(this.userAccount, amount, this.appAccount.address)
+      );
 
       if (destination) {
-        tx.addOperation(this._appPaymentOp(amount, destination));
+        tx.addOperation(this._paymentOp(this.appAccount, amount, destination));
       }
     });
   }
@@ -109,14 +108,8 @@ export default class App {
    * @param {string} [destination] - third party receiver address
    * @returns {Promise}
    */
-  async payout(amount, destination = this.userKeypair.publicKey()) {
-    if (this.appBalance < Number(amount)) {
-      throw new Error("Insufficient Funds");
-    }
-
-    return this._submitTx(tx => {
-      tx.addOperation(this._appPaymentOp(amount, destination));
-    });
+  async payout(amount, destination = this.userAccount.address) {
+    return this._sendPayment(this.appAccount, amount, destination);
   }
 
   /**
@@ -126,12 +119,21 @@ export default class App {
    * @returns {Promise}
    */
   async transfer(amount, destination) {
-    if (this.userBalance < Number(amount)) {
-      throw new Error("Insufficient Funds");
-    }
+    return this._sendPayment(this.userAccount, amount, destination);
+  }
+
+  /**
+   * @private
+   * @param {Account} account - Source account
+   * @param {number} amount - Payment amount
+   * @param {string} destination - Payment destination address
+   * @returns {Promise}
+   */
+  async _sendPayment(account, amount, destination) {
+    this._ensureSufficientFunds(account, amount);
 
     return this._submitTx(tx => {
-      tx.addOperation(this._userPaymentOp(amount, destination));
+      tx.addOperation(this._paymentOp(account, amount, destination));
     });
   }
 
@@ -163,30 +165,16 @@ export default class App {
 
   /**
    * @private
+   * @param {Account} account - account to send payment from
    * @param {number} amount - payment amount
    * @param {string} destination - receiver address
    * @returns {Operation} payment operation
    */
-  _userPaymentOp(amount, destination) {
+  _paymentOp(account, amount, destination) {
     return Operation.payment({
       asset: Client.stellarAsset,
       amount: amount.toString(),
-      source: this.userKeypair.publicKey(),
-      destination
-    });
-  }
-
-  /**
-   * @private
-   * @param {number} amount - payment amount
-   * @param {string} destination - receiver address
-   * @returns {Operation} payment operation
-   */
-  _appPaymentOp(amount, destination) {
-    return Operation.payment({
-      asset: Client.stellarAsset,
-      amount: amount.toString(),
-      source: this.appKeypair.publicKey(),
+      source: account.address,
       destination
     });
   }
@@ -195,7 +183,7 @@ export default class App {
    * @private
    * @returns {boolean} true if developer is authorized to use an application and trustline exists
    */
-  _validateUserBalance() {
+  _validateUserAccount() {
     if (!this.authorized) {
       throw new Error("Authorisation missing");
     }
@@ -205,5 +193,16 @@ export default class App {
     }
 
     return true;
+  }
+
+  /**
+   * @private
+   * @param {Account} account
+   * @param {number|string} amount
+   */
+  _ensureSufficientFunds(account, amount) {
+    if (account.balance() < Number(amount)) {
+      throw new Error("Insufficient Funds");
+    }
   }
 }

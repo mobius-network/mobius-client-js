@@ -31,7 +31,8 @@
     "lint": "eslint --quiet . --ext .js",
     "precommit": "lint-staged",
     "prepack": "yarn run build",
-    "test": "jest --config test/jest.config.js"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",
@@ -60,6 +61,7 @@
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "lint-staged": "^7.0.4",
+    "ms": "^2.1.1",
     "prettier": "^1.12.1",
     "timekeeper": "^2.1.1",
     "uglifyjs-webpack-plugin": "^1.2.4",
@@ -74,5 +76,11 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js": "babel-jest"
+    },
+    "verbose": true
   }
 }

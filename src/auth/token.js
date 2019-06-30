@@ -5,20 +5,19 @@ import { verify } from "../utils/keypair";
 /** Checks challenge transaction signed by user on developer's side. */
 export default class Token {
   /**
-   * @param {string} developerSecret - Developer private key
+   * @param {string} appSecret - Developer private key
    * @param {string} xdr - Challenge transaction xdr
-   * @param {string} address - User public key
+   * @param {string} userPublicKey - User public key
    */
-  constructor(developerSecret, xdr, address) {
-    this._developerSecret = developerSecret;
+  constructor(appSecret, xdr, userPublicKey) {
+    this._appKeypair = Keypair.fromSecret(appSecret);
+    this._userKeypair = Keypair.fromPublicKey(userPublicKey);
     this._tx = new Transaction(xdr);
-    this._address = address;
-    this._keypair = undefined;
-    this._theirKeypair = undefined;
   }
+
   /**
    * Returns time bounds for given transaction
-   * @returns {StellarSdk.xdr.TimeBounds} Time bounds for given transaction (`minTime` and `maxTime`)
+   * @returns {Object} Time bounds for given transaction (`minTime` and `maxTime`)
    */
   get timeBounds() {
     const { timeBounds } = this._tx;
@@ -27,7 +26,10 @@ export default class Token {
       throw new Error("Wrong challenge transaction structure");
     }
 
-    return timeBounds;
+    return {
+      minTime: parseInt(timeBounds.minTime, 10),
+      maxTime: parseInt(timeBounds.maxTime, 10)
+    };
   }
 
   /**
@@ -35,7 +37,7 @@ export default class Token {
    * @returns {string} Address.
    */
   get address() {
-    return this._getKeypair.publicKey();
+    return this._userKeypair.publicKey();
   }
 
   /**
@@ -44,18 +46,23 @@ export default class Token {
    * @returns {boolean} true if transaction is valid, raises exception otherwise
    */
   validate(strict = true) {
-    if (!this._signedCorrectly) {
-      throw new Error("Wrong challenge transaction signature");
-    }
+    const { minTime, maxTime } = this.timeBounds;
+    const now = Math.floor(new Date().getTime() / 1000);
 
-    const bounds = this.timeBounds;
-
-    if (!this._timeNowCovers(bounds)) {
+    if (now < minTime || now > maxTime) {
       throw new Error("Challenge transaction expired");
     }
 
-    if (strict && this._tooOld(bounds)) {
-      throw new Error("Challenge transaction expired");
+    if (strict && now > minTime + Client.strictInterval) {
+      throw new Error("Challenge transaction too old");
+    }
+
+    if (!verify(this._tx, this._appKeypair)) {
+      throw new Error("Challenge transaction is not signed by app");
+    }
+
+    if (!verify(this._tx, this._userKeypair)) {
+      throw new Error("Challenge transaction is not signed by user");
     }
 
     return true;
@@ -75,61 +82,5 @@ export default class Token {
     }
 
     return hash.toString("hex");
-  }
-
-  /**
-   * @private
-   * @returns {StellarSdk.Keypair} StellarSdk.Transaction object for given Developer private key
-   */
-  get _getKeypair() {
-    this._keypair = this._keypair || Keypair.fromSecret(this._developerSecret);
-
-    return this._keypair;
-  }
-
-  /**
-   * @private
-   * @returns {StellarSdk.Keypair} StellarSdk.Transaction object of user being authorized
-   */
-  get _getTheirKeypair() {
-    this._theirKeypair =
-      this._theirKeypair || Keypair.fromPublicKey(this._address);
-
-    return this._theirKeypair;
-  }
-
-  /**
-   * @private
-   * @returns {boolean} true if transaction is correctly signed by user and developer
-   */
-  get _signedCorrectly() {
-    const isSignedByDeveloper = verify(this._tx, this._getKeypair);
-    const isSignedByUser = verify(this._tx, this._getTheirKeypair);
-
-    return isSignedByDeveloper && isSignedByUser;
-  }
-
-  /**
-   * @private
-   * @param {StellarSdk.xdr.TimeBounds} timeBounds - Time bounds for given transaction
-   * @returns {boolean} true if current time is within transaction time bounds
-   */
-  _timeNowCovers(timeBounds) {
-    const now = Math.floor(new Date().getTime() / 1000);
-
-    return (
-      now >= parseInt(timeBounds.minTime, 10) &&
-      now <= parseInt(timeBounds.maxTime, 10)
-    );
-  }
-
-  /**
-   * @param {StellarSdk.xdr.TimeBounds} timeBounds - Time bounds for given transaction
-   * @returns {boolean} true if transaction is created more than 10 secods from now
-   */
-  _tooOld(timeBounds) {
-    const now = Math.floor(new Date().getTime() / 1000);
-
-    return now > parseInt(timeBounds.minTime, 10) + Client.strictInterval;
   }
 }
